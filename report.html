@@ -1,131 +1,270 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>گزارش تماس ورودی</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>گزارش کال‌سنتر — قالب</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: Tahoma, sans-serif; direction: rtl; margin: 30px; }
-    h1, h2, h3 { text-align: center; }
-    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-    th, td { border: 1px solid #000; padding: 6px; text-align: center; }
-    .section { margin: 40px 0; }
-    .bold { font-weight: bold; }
+    body { font-family: 'Segoe UI', Tahoma, Arial; background:#f7f9fc; color:#222; padding:20px; }
+    .card { border-radius:12px; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
+    h1,h2,h3 { font-weight:600; }
+    .metric { font-size:1.6rem; font-weight:700; }
+    .sub { color:#6b7280; }
+    table th, table td { vertical-align: middle; }
+    .small-muted { font-size:0.9rem; color:#6b7280; }
+    .chart-wrap { height:300px; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="mb-4">
+      <h1>Call Center Report — قالب</h1>
+      <div class="small-muted">تاریخ گزارش: <span id="reportDate">-</span></div>
+    </div>
 
-  <h1>Call Center Report - Incoming Call</h1>
-  <h2>September 1404</h2>
+    <!-- Overall Summary -->
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-4">
+        <div class="card p-3">
+          <div class="sub">کل تماس‌ها</div>
+          <div id="totalCalls" class="metric">-</div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card p-3">
+          <div class="sub">تماس‌های پاسخ‌داده‌شده</div>
+          <div id="answeredCalls" class="metric">-</div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card p-3">
+          <div class="sub">تماس‌های از دست رفته / رها شده</div>
+          <div id="missAband" class="metric">- / -</div>
+        </div>
+      </div>
+    </div>
 
-  <div class="section">
-    <h3>خلاصه کلی</h3>
-    <table>
-      <tr>
-        <th>کل تماس‌ها</th>
-        <th>پاسخ داده‌شده</th>
-        <th>از دست رفته</th>
-        <th>رها شده</th>
-        <th>SLA ≤ 20s</th>
-        <th>ASA</th>
-        <th>AHT</th>
-      </tr>
-      <tr>
-        <td>31588</td>
-        <td>28493</td>
-        <td>1311</td>
-        <td>1784</td>
-        <td>67.5%</td>
-        <td>29</td>
-        <td>91</td>
-      </tr>
-    </table>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-3">
+        <div class="card p-3">
+          <div class="sub">SLA ≤ 20s</div>
+          <div id="sla20" class="metric">- %</div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="card p-3">
+          <div class="sub">ASA (ثانیه)</div>
+          <div id="asa" class="metric">-</div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="card p-3">
+          <div class="sub">AHT (ثانیه)</div>
+          <div id="aht" class="metric">-</div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="card p-3">
+          <div class="sub">Missed Rate</div>
+          <div id="missRate" class="metric">- %</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hourly table -->
+    <div class="card p-3 mb-4">
+      <h3 class="mb-3">حجم تماس ساعتی</h3>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ساعت</th>
+              <th>تعداد تماس</th>
+            </tr>
+          </thead>
+          <tbody id="hourlyTable">
+            <!-- سطرها از جاوااسکریپت اضافه می‌شوند -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Shifts -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <div class="card p-3">
+          <h4>شیفت صبح (8-16)</h4>
+          <div class="small-muted">تلفیقی</div>
+          <ul class="list-unstyled mt-2">
+            <li>کل تماس: <span id="mor_total">-</span></li>
+            <li>پاسخ: <span id="mor_answered">-</span></li>
+            <li>از دست رفته: <span id="mor_missed">-</span></li>
+            <li>ASA: <span id="mor_asa">-</span> ثانیه</li>
+            <li>AHT: <span id="mor_aht">-</span> ثانیه</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="card p-3">
+          <h4>شیفت عصر (16-24)</h4>
+          <div class="small-muted">تلفیقی</div>
+          <ul class="list-unstyled mt-2">
+            <li>کل تماس: <span id="eve_total">-</span></li>
+            <li>پاسخ: <span id="eve_answered">-</span></li>
+            <li>از دست رفته: <span id="eve_missed">-</span></li>
+            <li>ASA: <span id="eve_asa">-</span> ثانیه</li>
+            <li>AHT: <span id="eve_aht">-</span> ثانیه</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <div class="card p-3">
+          <h5>حجم تماس (ساعتی)</h5>
+          <div class="chart-wrap">
+            <canvas id="hourlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="card p-3">
+          <h5>توزیع SLA</h5>
+          <div class="chart-wrap">
+            <canvas id="slaChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics table summary -->
+    <div class="card p-3 mb-5">
+      <h4>خلاصه متریک‌ها</h4>
+      <table class="table">
+        <thead><tr><th>شاخص</th><th>مقدار</th></tr></thead>
+        <tbody id="metricsSummary">
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="small-muted text-center">Generated by قالب — تاریخ تولید: <span id="genDate">-</span></footer>
   </div>
 
-  <div class="section">
-    <h3>شیفت صبح (8-16)</h3>
-    <table>
-      <tr>
-        <th>کل</th>
-        <th>پاسخ داده‌شده</th>
-        <th>از دست رفته</th>
-        <th>رها شده</th>
-        <th>ASA</th>
-        <th>AHT</th>
-      </tr>
-      <tr>
-        <td>14154</td>
-        <td>12909</td>
-        <td>588</td>
-        <td>657</td>
-        <td>28</td>
-        <td>91</td>
-      </tr>
-    </table>
-  </div>
+  <script>
+    /***** مثال داده — اینجا را با JSON روزانه‌ات جایگزین کن *****/
+    const data = {
+      "reportDate": "2025-09-28",
+      "totalCalls": 31588,
+      "answeredCalls": 28493,
+      "missedCalls": 1311,
+      "abandonedCalls": 1784,
+      "sla_le_20_pct": 67.5,
+      "asa": 29,
+      "aht": 91,
+      "hourly": [
+        {"hour":"8:00","count":383},{"hour":"9:00","count":761},{"hour":"10:00","count":1022},
+        {"hour":"11:00","count":1385},{"hour":"12:00","count":2169},{"hour":"13:00","count":3107},
+        {"hour":"14:00","count":3405},{"hour":"15:00","count":1922},{"hour":"16:00","count":1193},
+        {"hour":"17:00","count":928},{"hour":"18:00","count":1273},{"hour":"19:00","count":1893},
+        {"hour":"20:00","count":2790},{"hour":"21:00","count":3470},{"hour":"22:00","count":3629},
+        {"hour":"23:00","count":2251}
+      ],
+      "morning": {"total":14154,"answered":12909,"missed":588,"abandoned":657,"asa":28,"aht":91},
+      "evening": {"total":17427,"answered":15582,"missed":723,"abandoned":1122,"asa":29,"aht":91},
+      "sla_breakdown": {"le20":64.21,"t20_30":17.34,"gt30":18.45}
+    };
 
-  <div class="section">
-    <h3>شیفت عصر (16-24)</h3>
-    <table>
-      <tr>
-        <th>کل</th>
-        <th>پاسخ داده‌شده</th>
-        <th>از دست رفته</th>
-        <th>رها شده</th>
-        <th>ASA</th>
-        <th>AHT</th>
-      </tr>
-      <tr>
-        <td>17427</td>
-        <td>15582</td>
-        <td>723</td>
-        <td>1122</td>
-        <td>29</td>
-        <td>91</td>
-      </tr>
-    </table>
-  </div>
+    // helper: write text
+    const $ = id => document.getElementById(id);
 
-  <div class="section">
-    <h3>توزیع تماس‌ها بر اساس ساعت</h3>
-    <table>
-      <tr>
-        <th>ساعت</th>
-        <th>تعداد تماس</th>
-      </tr>
-      <tr><td>08:00</td><td>383</td></tr>
-      <tr><td>09:00</td><td>761</td></tr>
-      <tr><td>10:00</td><td>1022</td></tr>
-      <tr><td>11:00</td><td>1385</td></tr>
-      <tr><td>12:00</td><td>2169</td></tr>
-      <tr><td>13:00</td><td>3107</td></tr>
-      <tr><td>14:00</td><td>3405</td></tr>
-      <tr><td>15:00</td><td>1922</td></tr>
-      <tr><td>16:00</td><td>1193</td></tr>
-      <tr><td>17:00</td><td>928</td></tr>
-      <tr><td>18:00</td><td>1273</td></tr>
-      <tr><td>19:00</td><td>1893</td></tr>
-      <tr><td>20:00</td><td>2790</td></tr>
-      <tr><td>21:00</td><td>3470</td></tr>
-      <tr><td>22:00</td><td>3629</td></tr>
-      <tr><td>23:00</td><td>2251</td></tr>
-    </table>
-  </div>
+    // fill top numbers
+    $('reportDate').textContent = data.reportDate || '-';
+    $('totalCalls').textContent = data.totalCalls ?? '-';
+    $('answeredCalls').textContent = data.answeredCalls ?? '-';
+    $('missAband').textContent = (data.missedCalls ?? '-') + ' / ' + (data.abandonedCalls ?? '-');
+    $('sla20').textContent = (data.sla_le_20_pct ?? '-') + ' %';
+    $('asa').textContent = data.asa ?? '-';
+    $('aht').textContent = data.aht ?? '-';
+    const missRate = (data.missedCalls && data.totalCalls) ? ((data.missedCalls / data.totalCalls) * 100).toFixed(2) : '-';
+    $('missRate').textContent = missRate === '-' ? '-' : (missRate + ' %');
+    $('genDate').textContent = new Date().toLocaleString('fa-IR');
 
-  <div class="section">
-    <h3>توزیع SLA</h3>
-    <table>
-      <tr>
-        <th>≤20s</th>
-        <th>20-30s</th>
-        <th>&gt;30s</th>
-      </tr>
-      <tr>
-        <td>64.21%</td>
-        <td>17.34%</td>
-        <td>18.45%</td>
-      </tr>
-    </table>
-  </div>
+    // hourly table
+    const tbody = $('hourlyTable');
+    data.hourly.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${row.hour}</td><td>${row.count}</td>`;
+      tbody.appendChild(tr);
+    });
 
+    // shifts
+    $('mor_total').textContent = data.morning.total ?? '-';
+    $('mor_answered').textContent = data.morning.answered ?? '-';
+    $('mor_missed').textContent = data.morning.missed ?? '-';
+    $('mor_asa').textContent = data.morning.asa ?? '-';
+    $('mor_aht').textContent = data.morning.aht ?? '-';
+
+    $('eve_total').textContent = data.evening.total ?? '-';
+    $('eve_answered').textContent = data.evening.answered ?? '-';
+    $('eve_missed').textContent = data.evening.missed ?? '-';
+    $('eve_asa').textContent = data.evening.asa ?? '-';
+    $('eve_aht').textContent = data.evening.aht ?? '-';
+
+    // metrics summary table
+    const metrics = [
+      ['کل تماس‌ها', data.totalCalls],
+      ['پاسخ داده‌شده', data.answeredCalls],
+      ['از دست رفته', data.missedCalls],
+      ['رها شده', data.abandonedCalls],
+      ['SLA ≤20s (%)', data.sla_le_20_pct + ' %'],
+      ['ASA (s)', data.asa],
+      ['AHT (s)', data.aht]
+    ];
+    const ms = $('metricsSummary');
+    metrics.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${m[0]}</td><td>${m[1] ?? '-'}</td>`;
+      ms.appendChild(tr);
+    });
+
+    // Charts
+    // hourly chart
+    const hours = data.hourly.map(h=>h.hour);
+    const counts = data.hourly.map(h=>h.count);
+
+    const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+    new Chart(hourlyCtx, {
+      type: 'bar',
+      data: {
+        labels: hours,
+        datasets: [{ label: 'تعداد تماس', data: counts }]
+      },
+      options: {
+        responsive:true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'ساعت' } },
+          y: { title: { display: true, text: 'تعداد تماس' }, beginAtZero:true }
+        }
+      }
+    });
+
+    // SLA pie/doughnut
+    const sla = data.sla_breakdown || {le20:0,t20_30:0,gt30:0};
+    const slaCtx = document.getElementById('slaChart').getContext('2d');
+    new Chart(slaCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['≤20s','20-30s','>30s'],
+        datasets: [{ data: [sla.le20, sla.t20_30, sla.gt30] }]
+      },
+      options: { responsive:true, plugins:{ legend:{ position:'bottom' } } }
+    });
+
+  </script>
 </body>
 </html>
